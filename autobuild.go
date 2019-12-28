@@ -4,11 +4,9 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
-	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
-	"regexp"
 	"runtime"
 	"strings"
 	"time"
@@ -92,14 +90,10 @@ func watchExtensions() []string {
 	}
 	defer f.Close()
 
-	rd := bufio.NewReader(f)
+	scanner := bufio.NewScanner(f)
 
-	for {
-		line, err := rd.ReadString('\n')
-
-		if err != nil || io.EOF == err {
-			break
-		}
+	for scanner.Scan() {
+		line := scanner.Text()
 
 		exts = append(exts, line)
 	}
@@ -123,8 +117,10 @@ func (w *watch) watcher(paths []string) {
 			case event := <-watcher.Events:
 				build := true
 				if !checkIfWatch(event.Name) {
+					fmt.Println("忽略 ", event.Name)
 					continue
 				}
+
 				if event.Op&fsnotify.Chmod == fsnotify.Chmod {
 					ColorLog("[SKIP] 跳过 [%s] \n", event)
 					continue
@@ -140,7 +136,7 @@ func (w *watch) watcher(paths []string) {
 
 				if build {
 					go func() {
-						scheduleTime = time.Now().Add(1 * time.Second)
+						scheduleTime = time.Now().Add(time.Second)
 						for {
 							time.Sleep(scheduleTime.Sub(time.Now()))
 							if time.Now().After(scheduleTime) {
@@ -218,9 +214,10 @@ func (w *watch) restart() {
 
 func checkIfWatch(name string) bool {
 	exts := watchExtensions()
+	fmt.Println(exts)
 	if len(exts) > 0 {
 		for _, s := range exts {
-			if ok, _ := regexp.MatchString(s, name); ok {
+			if strings.HasSuffix(name, s) {
 				return true
 			}
 		}
