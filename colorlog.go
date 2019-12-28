@@ -10,10 +10,10 @@ import (
 
 const (
 	DEBUG   = "DEBU"
-	INFO    = "INFO"
 	TRAC    = "TRAC"
-	ERROR   = "ERRO"
+	INFO    = "INFO"
 	WARNING = "WARN"
+	ERROR   = "ERRO"
 	SUCCESS = "SUCC"
 	SKIP    = "SKIP"
 )
@@ -41,7 +41,6 @@ func colorLogS(format string, a ...interface{}) string {
 		i2 := strings.Index(log, "]")
 		log = strings.Replace(log, log[i1:i2+1], color.RedString(log[i1+1:i2]), -1)
 	}
-
 
 	// (...) ...
 	if strings.Contains(log, "(") && strings.Contains(log, ")") {
