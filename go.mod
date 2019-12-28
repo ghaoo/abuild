@@ -1,4 +1,4 @@
-module owl
+module github.com/ghaoo/abuild
 
 go 1.13
 

@@ -22,6 +22,8 @@ const usage = `
   	-r    是否搜索子目录，默认为true
 `
 
+var defaultExtensions = []string{".go"}
+
 var (
 	eventTime    = make(map[string]int64)
 	scheduleTime time.Time
@@ -84,9 +86,9 @@ func main() {
 // 读取.autowatcher文件，用于设置需要监听的文件后缀
 func watchExtensions() []string {
 	var exts []string
-	f, err := os.OpenFile(".autowatcher", os.O_RDONLY|os.O_CREATE, 0666)
-	if err != nil {
-		panic(err)
+	f, err := os.OpenFile(".extensions", os.O_RDONLY, 0666)
+	if err != nil && os.IsNotExist(err) {
+		return defaultExtensions
 	}
 	defer f.Close()
 

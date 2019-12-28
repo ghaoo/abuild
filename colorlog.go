@@ -19,7 +19,7 @@ const (
 )
 
 func ColorLog(format string, a ...interface{}) {
-	fmt.Print(colorLogS(format, a...))
+	color.White(colorLogS(format, a...))
 }
 
 func colorLogS(format string, a ...interface{}) string {
@@ -39,28 +39,28 @@ func colorLogS(format string, a ...interface{}) string {
 	if strings.Contains(log, "[") && strings.Contains(log, "]") {
 		i1 := strings.Index(log, "[")
 		i2 := strings.Index(log, "]")
-		log = strings.Replace(log, log[i1:i2+1], color.RedString(log[i1+1:i2]), -1)
+		log = strings.Replace(log, log[i1:i2+1], color.Set(color.FgRed).Sprintf(log[i1+1:i2]), -1)
 	}
 
 	// (...) ...
 	if strings.Contains(log, "(") && strings.Contains(log, ")") {
 		i1 := strings.Index(log, "(")
 		i2 := strings.Index(log, ")")
-		log = strings.Replace(log, log[i1:i2+1], color.MagentaString(log[i1+1:i2]), -1)
+		log = strings.Replace(log, log[i1:i2+1], color.Set(color.FgGreen).Sprintf(log[i1+1:i2]), -1)
 	}
 
 	// <...> ...
 	if strings.Contains(log, "<") && strings.Contains(log, ">") {
 		i1 := strings.Index(log, "<")
 		i2 := strings.Index(log, ">")
-		log = strings.Replace(log, log[i1:i2+1], color.CyanString(log[i1+1:i2]), -1)
+		log = strings.Replace(log, log[i1:i2+1], color.Set(color.FgCyan).Sprintf(log[i1+1:i2]), -1)
 	}
 
 	// {...} ...
 	if strings.Contains(log, "{") && strings.Contains(log, "}") {
 		i1 := strings.Index(log, "{")
 		i2 := strings.Index(log, "}")
-		log = strings.Replace(log, log[i1:i2+1], color.BlueString(log[i1+1:i2]), -1)
+		log = strings.Replace(log, log[i1:i2+1], color.Set(color.FgBlue).Sprintf(log[i1+1:i2]), -1)
 	}
 
 	log = clog + log
@@ -73,19 +73,19 @@ func getColorLevel(level string) string {
 	level = strings.ToUpper(level)
 	switch level {
 	case DEBUG:
-		return color.WhiteString(level)
+		return color.Set(color.FgWhite).Sprintf(level)
 	case TRAC:
-		return color.CyanString(level)
+		return color.Set(color.FgCyan).Sprintf(level)
 	case INFO:
-		return color.BlueString(level)
+		return color.Set(color.FgBlue).Sprintf(level)
 	case WARNING:
-		return color.YellowString(level)
+		return color.Set(color.FgYellow).Sprintf(level)
 	case ERROR:
-		return color.RedString(level)
+		return color.Set(color.FgRed).Sprintf(level)
 	case SUCCESS:
-		return color.GreenString(level)
+		return color.Set(color.FgGreen).Sprintf(level)
 	case SKIP:
-		return color.MagentaString(level)
+		return color.Set(color.FgMagenta).Sprintf(level)
 	default:
 		return level
 	}
