@@ -15,7 +15,7 @@ go get -u github.com/ghaoo/autobuild
 ```go
 Usage:
   	-h    显示当前帮助信息
-  	-f	  指定main文件
+  	-f    指定main文件
   	-o    执行编译后的可执行文件名
   	-r    是否搜索子目录，默认为true
 ```
