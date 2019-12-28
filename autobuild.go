@@ -117,7 +117,6 @@ func (w *watch) watcher(paths []string) {
 			case event := <-watcher.Events:
 				build := true
 				if !checkIfWatch(event.Name) {
-					fmt.Println("忽略 ", event.Name)
 					continue
 				}
 
@@ -214,7 +213,7 @@ func (w *watch) restart() {
 
 func checkIfWatch(name string) bool {
 	exts := watchExtensions()
-	fmt.Println(exts)
+
 	if len(exts) > 0 {
 		for _, s := range exts {
 			if strings.HasSuffix(name, s) {
