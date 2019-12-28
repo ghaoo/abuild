@@ -1,11 +1,14 @@
 package main
 
 import (
+	"bufio"
 	"flag"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"runtime"
 	"strings"
 	"time"
@@ -20,9 +23,6 @@ const usage = `
   	-o    执行编译后的可执行文件名
   	-r    是否搜索子目录，默认为true
 `
-
-// 需要监控的文件后缀
-var watchExts []string
 
 var (
 	eventTime    = make(map[string]int64)
@@ -83,18 +83,29 @@ func main() {
 	<-done
 }
 
-/*func (w *watch) watchExtensions() []string {
-	var ignore_file = ".ignore"
-	_, err := os.Stat(ignore_file)
-	if os.IsNotExist(err) {
-		_, err := os.OpenFile(ignore_file, os.O_WRONLY|os.O_CREATE, 0755)
-		if err != nil {
-			panic(err)
+// 读取.autowatcher文件，用于设置需要监听的文件后缀
+func watchExtensions() []string {
+	var exts []string
+	f, err := os.OpenFile(".autowatcher", os.O_RDONLY|os.O_CREATE, 0666)
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+
+	rd := bufio.NewReader(f)
+
+	for {
+		line, err := rd.ReadString('\n')
+
+		if err != nil || io.EOF == err {
+			break
 		}
+
+		exts = append(exts, line)
 	}
 
-
-}*/
+	return exts
+}
 
 func (w *watch) watcher(paths []string) {
 
@@ -111,7 +122,7 @@ func (w *watch) watcher(paths []string) {
 			select {
 			case event := <-watcher.Events:
 				build := true
-				if !w.checkIfWatchExt(event.Name) {
+				if !checkIfWatch(event.Name) {
 					continue
 				}
 				if event.Op&fsnotify.Chmod == fsnotify.Chmod {
@@ -205,10 +216,13 @@ func (w *watch) restart() {
 	}
 }
 
-func (w *watch) checkIfWatchExt(name string) bool {
-	for _, s := range watchExts {
-		if strings.HasSuffix(name, s) {
-			return true
+func checkIfWatch(name string) bool {
+	exts := watchExtensions()
+	if len(exts) > 0 {
+		for _, s := range exts {
+			if ok, _ := regexp.MatchString(s, name); ok {
+				return true
+			}
 		}
 	}
 	return false
@@ -260,7 +274,6 @@ func recursivePath(recursive bool, paths []string) []string {
 			ColorLog("[ERRO] 遍历监视目录错误: [%s] \n", err)
 		}
 
-		//(BUG):不能监视隐藏目录下的文件
 		if fi.IsDir() && strings.Index(path, "/.") < 0 {
 			ret = append(ret, path)
 		}
