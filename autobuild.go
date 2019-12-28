@@ -31,7 +31,6 @@ var (
 
 // 监听器
 type watch struct {
-	path      string    // 监听目录，默认当前目录
 	appName   string    // 输出的程序文件
 	appCmd    *exec.Cmd // appName的命令行包装引用，方便结束其进程。
 	goCmdArgs []string  // 传递给go build的参数
@@ -40,11 +39,10 @@ type watch struct {
 func main() {
 	// 初始化flag
 	var showHelp, recursive bool
-	var watchPath, outputName, mainFiles string
+	var outputName, mainFiles string
 
 	flag.BoolVar(&showHelp, "h", false, "显示帮助信息")
 	flag.BoolVar(&recursive, "r", true, "是否查找子目录")
-	flag.StringVar(&watchPath, "p", "./", "指定监听目录")
 	flag.StringVar(&outputName, "o", "", "指定输出名称")
 	flag.StringVar(&mainFiles, "f", "", "指定需要编译的文件")
 	flag.Usage = func() {
