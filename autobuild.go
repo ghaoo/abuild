@@ -81,7 +81,7 @@ func main() {
 	<-done
 }
 
-// 读取.autowatcher文件，用于设置需要监听的文件后缀
+// 读取.extensions文件，用于设置需要监听的文件后缀
 func watchExtensions() []string {
 	var exts []string
 	f, err := os.OpenFile(".extensions", os.O_RDONLY, 0666)
